@@ -1,4 +1,3 @@
-from crypt import methods
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
