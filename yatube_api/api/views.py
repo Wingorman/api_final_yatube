@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import mixins
 
 from posts.models import Post, Group, Follow
 from .permissions import IsOwnerOrReady
@@ -45,7 +46,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         return post.comments.all()
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class BaseCreateListViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    pass
+
+
+class FollowViewSet(BaseCreateListViewSet):
 
     serializer_class = FollowSerializer
     filter_backends = [SearchFilter]
@@ -62,4 +69,5 @@ class FollowViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
+        user = self.request.user
+        return user.follower.all()
